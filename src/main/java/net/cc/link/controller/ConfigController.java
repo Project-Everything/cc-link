@@ -20,11 +20,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-// Controller class for managing configuration files
+/**
+ * Controller class for config files.
+ *
+ * @since 2.0.0
+ */
 @RequiredArgsConstructor
 public final class ConfigController {
 
     private final LinkPlugin plugin;
+
     private CommentedConfigurationNode configNode;
     private CommentedConfigurationNode messagesNode;
 
@@ -104,4 +109,5 @@ public final class ConfigController {
                 ? MiniMessage.miniMessage().deserialize(message, tagResolvers.toArray(TagResolver[]::new))
                 : Component.text(key);
     }
+
 }

@@ -10,6 +10,11 @@ import net.cc.link.controller.ServiceController;
 import net.cc.link.model.ConfigServer;
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+ * Main class.
+ *
+ * @since 2.0.0
+ */
 @Getter
 public final class LinkPlugin extends JavaPlugin {
 
@@ -50,7 +55,7 @@ public final class LinkPlugin extends JavaPlugin {
     }
 
     private void registerCommands() {
-        // Register Paper commands
+        // Register commands
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             final Commands registrar = event.registrar();
 
@@ -60,4 +65,5 @@ public final class LinkPlugin extends JavaPlugin {
             }
         });
     }
+
 }

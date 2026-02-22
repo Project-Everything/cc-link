@@ -7,9 +7,9 @@ import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import lombok.RequiredArgsConstructor;
+import net.cc.core.api.model.CoreServer;
 import net.cc.link.LinkPlugin;
 import net.cc.link.model.ConfigServer;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -18,6 +18,11 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
+/**
+ * Class for a server command.
+ *
+ * @since 2.0.0
+ */
 @RequiredArgsConstructor
 public final class ServerCommand {
 
@@ -26,11 +31,12 @@ public final class ServerCommand {
 
     // Registers the command
     public void register(final Commands registrar) {
-        final var command = Commands.literal(configServer.getServer())
+        final var command = Commands.literal(this.configServer.getServer())
+                .requires(s -> s.getSender().hasPermission(this.configServer.getPermission()))
                 .executes(this::execute)
                 .build();
 
-        registrar.register(command, "Connect to " + configServer.getServer());
+        registrar.register(command, "Connect to " + this.configServer.getServer(), this.configServer.getAliases());
     }
 
     // Executes the command
@@ -43,31 +49,38 @@ public final class ServerCommand {
             return 0;
         }
 
-        // Check if player has permission
-        if (!player.hasPermission(configServer.getPermission())) {
-            player.sendMessage(MiniMessage.miniMessage().deserialize("<red>CC <white>» <gray>You do not have permission to use this command."));
-            return 0;
-        }
-
         // Check if player is already connected
         if (this.plugin.getServiceController().getCoreAPI() == null) {
-            if (this.plugin.getServerType().toString().equals(this.configServer.getServer().toUpperCase())) {
-                player.sendMessage(this.plugin.getConfigController().getMessage("command-server-current",
-                        Placeholder.parsed("server", configServer.getServer())));
-                return 0;
+            final CoreServer coreServer = this.plugin.getServiceController().getServerType();
+
+            if (coreServer != null) {
+                final String serverName = coreServer.toString().toLowerCase();
+
+                if (this.configServer.getServer().equals(serverName)) {
+                    player.sendMessage(this.plugin.getConfigController().getMessage(
+                            "command-server-current",
+                            Placeholder.parsed("server", this.configServer.getServer()))
+                    );
+                    return 0;
+                }
             }
         }
 
         // Check if the server is online
-        if (isServerOnline()) {
+        if (this.isServerOnline()) {
             // Server is online, send player to server
-            player.sendMessage(this.plugin.getConfigController().getMessage("command-server-connect",
-                    Placeholder.parsed("server", configServer.getServer())));
-            sendToServer(player);
+            player.sendMessage(this.plugin.getConfigController().getMessage(
+                    "command-server-connect",
+                    Placeholder.parsed("server", this.configServer.getServer()))
+            );
+
+            this.sendToServer(player);
         } else {
             // Server is offline
-            player.sendMessage(this.plugin.getConfigController().getMessage("command-server-offline",
-                    Placeholder.parsed("server", configServer.getServer())));
+            player.sendMessage(this.plugin.getConfigController().getMessage(
+                    "command-server-offline",
+                    Placeholder.parsed("server", this.configServer.getServer()))
+            );
         }
 
         return Command.SINGLE_SUCCESS;
@@ -77,8 +90,12 @@ public final class ServerCommand {
     private boolean isServerOnline() {
         try (final Socket socket = new Socket()) {
             // Create socket connection
-            socket.connect(new InetSocketAddress(configServer.getAddress(), configServer.getPort()),
-                    this.plugin.getConfigController().getGlobalTimeout());
+            final InetSocketAddress address = new InetSocketAddress(
+                    this.configServer.getAddress(),
+                    this.configServer.getPort()
+            );
+
+            socket.connect(address, this.plugin.getConfigController().getGlobalTimeout());
             return true;
         } catch (final IOException ignored) {
             return false;
@@ -90,7 +107,9 @@ public final class ServerCommand {
         final ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Connect");
         out.writeUTF(configServer.getServer());
+
         // Send plugin message through Velocity
         player.sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
     }
+
 }

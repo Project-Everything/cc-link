@@ -2,13 +2,13 @@ import net.minecrell.pluginyml.paper.PaperPluginDescription
 
 plugins {
     id("java")
-    id("com.gradleup.shadow") version "9.0.2"
-    id("io.freefair.lombok") version "8.14.2"
-    id("de.eldoria.plugin-yml.paper") version "0.7.1"
+    id("com.gradleup.shadow") version "9.3.1"
+    id("io.freefair.lombok") version "9.2.0"
+    id("de.eldoria.plugin-yml.paper") version "0.8.0"
 }
 
 group = "net.cc"
-version = "1.0.0"
+version = "2.0.0"
 
 repositories {
     mavenCentral()

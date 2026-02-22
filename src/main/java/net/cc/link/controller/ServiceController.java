@@ -8,7 +8,11 @@ import net.cc.core.api.model.CoreServer;
 import net.cc.link.LinkPlugin;
 import org.jetbrains.annotations.Nullable;
 
-// Controller class for managing dependencies
+/**
+ * Controller class for external services.
+ *
+ * @since 2.0.0
+ */
 @Getter
 @RequiredArgsConstructor
 public final class ServiceController {
@@ -25,4 +29,5 @@ public final class ServiceController {
     public @Nullable CoreServer getServerType() {
         return this.coreAPI.getServer();
     }
+
 }
