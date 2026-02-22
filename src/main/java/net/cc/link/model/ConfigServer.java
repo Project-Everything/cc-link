@@ -29,4 +29,5 @@ public final class ConfigServer {
         this.permission = "ae.server.lobby";
         this.aliases = new ArrayList<>();
     }
+
 }

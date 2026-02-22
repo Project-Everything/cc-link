@@ -28,7 +28,7 @@ dependencies {
     implementation("org.spongepowered:configurate-hocon:4.3.0-SNAPSHOT")
 
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
-    compileOnly("net.cc:core:2.0")
+    compileOnly("net.cc:core:2.1")
 }
 
 java {
